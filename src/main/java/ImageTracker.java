@@ -19,7 +19,13 @@ public class ImageTracker
   public static final Scalar TEST_UPPER = new Scalar(260/2,255,255); //Blue objects
 
   public static final int BOUNDING_SIZE = 5;
+  private static final int MIN_OBJECT_SIZE = 25;
 
+  /**
+   * Updates the Tracked object with all the images to needed to find the object
+   *
+   * @param tracked all images to find object
+   */
   public void track( Tracked tracked )
   {
     Mat matHierarchy = new Mat();
@@ -50,12 +56,8 @@ public class ImageTracker
       Rect boundingRect = Imgproc.boundingRect(contour);
 
       //if the width of the rect is less then 25 pixels, don't display it because they are just to small to be useful
-      if( boundingRect.width > 25)
+      if( boundingRect.width > MIN_OBJECT_SIZE && boundingRect.height > MIN_OBJECT_SIZE)
       {
-        //create a circle that is surrounds the object
-//        Point center = new Point(rec.br().x - rec.width / 2 , rec.br().y - rec.height / 2);
-//        Imgproc.circle(tracked.getTarget(), center, rec.width / 2, new Scalar(255, 0, 0), 5);
-
         //Create a square around the object
         Rect rect = new Rect( boundingRect.x-BOUNDING_SIZE, boundingRect.y-BOUNDING_SIZE, boundingRect.width + (BOUNDING_SIZE * 2), boundingRect.height + (BOUNDING_SIZE * 2) );
         Imgproc.rectangle( tracked.getTarget(), rect.tl(), rect.br(), new Scalar(255, 0, 0), BOUNDING_SIZE);
