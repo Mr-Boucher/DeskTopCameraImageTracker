@@ -14,8 +14,11 @@ public class ImageTracker
   public static final Scalar REFLECTIVE_TAPE_LOWER_COLOR_BOUNDS = new Scalar(58,0,109);
   public static final Scalar REFLECTIVE_TAPE_UPPER_COLOR_BOUNDS = new Scalar(93,255,240);
 
-  public static final Scalar TEST_LOWER = new Scalar(200/2, 100,20); //Blue lego
-  public static final Scalar TEST_UPPER = new Scalar(260/2,255,255); //Blue lego
+  //Just testing for blue objects
+  public static final Scalar TEST_LOWER = new Scalar(150/2, 100,20); //Blue objects
+  public static final Scalar TEST_UPPER = new Scalar(260/2,255,255); //Blue objects
+
+  public static final int BOUNDING_SIZE = 5;
 
   public void track( Tracked tracked )
   {
@@ -33,22 +36,29 @@ public class ImageTracker
     //mask out all colors not in range
     Core.inRange(tracked.getHsv(), TEST_LOWER, TEST_UPPER, tracked.getMasked());
 
-    //clean up noise
+    //Clean up noise
     Mat structuringElement = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(3,3));
     Imgproc.morphologyEx(tracked.getMasked(),tracked.getMasked(),Imgproc.MORPH_OPEN,structuringElement);
     Imgproc.morphologyEx(tracked.getMasked(),tracked.getMasked(),Imgproc.MORPH_CLOSE,structuringElement);
 
-    //
+    //find the edges/contours of object that meet the inRange color specifications.
     ArrayList<MatOfPoint> contours = new ArrayList<MatOfPoint>();
-
     Imgproc.findContours(tracked.getMasked().clone(), contours, matHierarchy, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_NONE);
     for( MatOfPoint contour : contours )
     {
-      Rect rec = Imgproc.boundingRect(contour);
-      if( rec.width > 100)
+      //Get the edge rectangle for all contour objects
+      Rect boundingRect = Imgproc.boundingRect(contour);
+
+      //if the width of the rect is less then 25 pixels, don't display it because they are just to small to be useful
+      if( boundingRect.width > 25)
       {
-        Point center = new Point(rec.br().x - rec.width / 2 - 15, rec.br().y - rec.height / 2);
-        Imgproc.circle(tracked.getTarget(), center, rec.width, new Scalar(255, 0, 0), 5);
+        //create a circle that is surrounds the object
+//        Point center = new Point(rec.br().x - rec.width / 2 , rec.br().y - rec.height / 2);
+//        Imgproc.circle(tracked.getTarget(), center, rec.width / 2, new Scalar(255, 0, 0), 5);
+
+        //Create a square around the object
+        Rect rect = new Rect( boundingRect.x-BOUNDING_SIZE, boundingRect.y-BOUNDING_SIZE, boundingRect.width + (BOUNDING_SIZE * 2), boundingRect.height + (BOUNDING_SIZE * 2) );
+        Imgproc.rectangle( tracked.getTarget(), rect.tl(), rect.br(), new Scalar(255, 0, 0), BOUNDING_SIZE);
       }
     }
   }

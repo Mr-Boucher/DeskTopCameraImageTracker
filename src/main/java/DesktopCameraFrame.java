@@ -49,6 +49,7 @@ public class DesktopCameraFrame extends JFrame
    */
   public DesktopCameraFrame()
   {
+    //set up frame exit listeners
     setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     addWindowListener(new WindowAdapter()
     {
@@ -60,6 +61,7 @@ public class DesktopCameraFrame extends JFrame
       }
     });
 
+    //Create panel within the frame
     setBounds(100, 100, 650 * 2, 490 * 2);
     mainPanel = new JPanel();
     mainPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -67,49 +69,63 @@ public class DesktopCameraFrame extends JFrame
     mainPanel.setLayout(null);
     mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
 
+    //layout 2 panels on top, color correct and HSV
     JPanel topPanel = new JPanel();
     topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.X_AXIS));
     mainPanel.add( topPanel );
-
-    JPanel bottomPanel = new JPanel();
-    bottomPanel.setLayout(new BoxLayout(bottomPanel, BoxLayout.X_AXIS));
-    mainPanel.add( bottomPanel );
-
     cameraInputPanel = new JPanel();
     topPanel.add( cameraInputPanel );
     hsvPanel = new JPanel();
     topPanel.add(hsvPanel);
 
+    //layout 2 panels on bottom Masked and Targeted
+    JPanel bottomPanel = new JPanel();
+    bottomPanel.setLayout(new BoxLayout(bottomPanel, BoxLayout.X_AXIS));
+    mainPanel.add( bottomPanel );
     maskedPanel = new JPanel();
     bottomPanel.add( maskedPanel );
     targetPanel = new JPanel();
     bottomPanel.add( targetPanel );
 
+    //start the background thread to run the receive the camera data
     cameraThread.start();
   }
 
+  /**
+   * Paint all the images on the panels
+   *
+   * @param g graphics object
+   */
   public void paint(Graphics g)
   {
-
+    //display the processed captured image
     Tracked tracked = new Tracked();
     if( cap.read(tracked.getCameraInput()) )
     {
+      //process the captured image
       tracker.track(tracked);
+
+      //display the color correct original image
       Graphics cameraInputGraphics = cameraInputPanel.getGraphics();
       cameraInputGraphics.drawImage(new Mat2Image(tracked.getColorCorrected()).getImage(), 0, 0, this);
 
+      //display the hsv image
       Graphics hsvGraphics = hsvPanel.getGraphics();
       hsvGraphics.drawImage(new Mat2Image(tracked.getHsv()).getImage(), 0, 0, this);
 
+      //display the black and white masked image
       Graphics maskedGraphics = maskedPanel.getGraphics();
       maskedGraphics.drawImage(new Mat2Image(tracked.getMasked()).getImage(), 0, 0, this);
 
+      //display the resulting image with target circle(s)
       Graphics targetGraphics = targetPanel.getGraphics();
       targetGraphics.drawImage(new Mat2Image(tracked.getTarget()).getImage(), 0, 0, this);
-
     }
   }
 
+  /**
+   * background thread for handling windowing events and displaying the processed images
+   */
   private class CameraThread extends Thread
   {
     private boolean running = false;
