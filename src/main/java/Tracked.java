@@ -1,7 +1,10 @@
 import org.opencv.core.Mat;
 
+import java.awt.*;
+import java.awt.image.BufferedImage;
+
 /**
- * Created by Chad on 2/9/2017.
+ * Container for all mats need to performance a single image tracking pass
  */
 public class Tracked
 {
@@ -10,6 +13,12 @@ public class Tracked
   private Mat hsv = new Mat();
   private Mat masked = new Mat();
   private Mat target = new Mat();
+  private Mat hierarchy = new Mat();
+
+  public Mat getHierarchy()
+  {
+    return hierarchy;
+  }
 
   public Mat getColorCorrected()
   {
@@ -34,5 +43,27 @@ public class Tracked
   public Mat getTarget()
   {
     return target;
+  }
+
+  /**
+   * Creates images for the Mat
+   *
+   * @param mat the Mat
+   *
+   * @return the Image
+   */
+  public static Image getImage( Mat mat ){
+    BufferedImage img = null;
+    int w = mat.cols();
+    int h = mat.rows();
+    if( w > 0 && h > 0 )
+    {
+      byte[] dat = new byte[w * h * 3];
+      mat.get(0, 0, dat);
+      img = new BufferedImage(w, h, BufferedImage.TYPE_3BYTE_BGR);
+      img.getRaster().setDataElements(0, 0, mat.cols(), mat.rows(), dat);
+    }
+
+    return img;
   }
 }

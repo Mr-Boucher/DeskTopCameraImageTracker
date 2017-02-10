@@ -10,16 +10,22 @@ import java.util.ArrayList;
  */
 public class ImageTracker
 {
-  //	these are the threshold values in order
+  //These are the threshold values in order
   public static final Scalar REFLECTIVE_TAPE_LOWER_COLOR_BOUNDS = new Scalar(58,0,109);
   public static final Scalar REFLECTIVE_TAPE_UPPER_COLOR_BOUNDS = new Scalar(93,255,240);
 
-  //Just testing for blue objects
-  public static final Scalar TEST_LOWER = new Scalar(150/2, 100,20); //Blue objects
-  public static final Scalar TEST_UPPER = new Scalar(260/2,255,255); //Blue objects
+  //Testing for blue objects
+  public static final Scalar TEST_LOWER = new Scalar(150/2, 100, 20); //Blue objects
+  public static final Scalar TEST_UPPER = new Scalar(260/2, 255, 255); //Blue objects
 
-  public static final int BOUNDING_SIZE = 5;
+  //Thickness of the boarder around objects
+  public static final int BOARDER_SIZE = 5;
+
+  //Minimum object size to target, otherwise my have lots of very small targets
   private static final int MIN_OBJECT_SIZE = 25;
+
+  //Default colors
+  private static final Scalar RED = new Scalar(255, 0, 0);
 
   /**
    * Updates the Tracked object with all the images to needed to find the object
@@ -28,8 +34,6 @@ public class ImageTracker
    */
   public void track( Tracked tracked )
   {
-    Mat matHierarchy = new Mat();
-
     //Flip because of my camera
     Imgproc.cvtColor(tracked.getCameraInput(),tracked.getColorCorrected(),Imgproc.COLOR_BGR2RGB);
 
@@ -49,7 +53,7 @@ public class ImageTracker
 
     //find the edges/contours of object that meet the inRange color specifications.
     ArrayList<MatOfPoint> contours = new ArrayList<MatOfPoint>();
-    Imgproc.findContours(tracked.getMasked().clone(), contours, matHierarchy, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_NONE);
+    Imgproc.findContours(tracked.getMasked().clone(), contours, tracked.getHierarchy(), Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_NONE);
     for( MatOfPoint contour : contours )
     {
       //Get the edge rectangle for all contour objects
@@ -59,8 +63,8 @@ public class ImageTracker
       if( boundingRect.width > MIN_OBJECT_SIZE && boundingRect.height > MIN_OBJECT_SIZE)
       {
         //Create a square around the object
-        Rect rect = new Rect( boundingRect.x-BOUNDING_SIZE, boundingRect.y-BOUNDING_SIZE, boundingRect.width + (BOUNDING_SIZE * 2), boundingRect.height + (BOUNDING_SIZE * 2) );
-        Imgproc.rectangle( tracked.getTarget(), rect.tl(), rect.br(), new Scalar(255, 0, 0), BOUNDING_SIZE);
+        Rect rect = new Rect( boundingRect.x- BOARDER_SIZE, boundingRect.y- BOARDER_SIZE, boundingRect.width + (BOARDER_SIZE * 2), boundingRect.height + (BOARDER_SIZE * 2) );
+        Imgproc.rectangle( tracked.getTarget(), rect.tl(), rect.br(), RED, BOARDER_SIZE);
       }
     }
   }

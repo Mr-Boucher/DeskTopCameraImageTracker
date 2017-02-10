@@ -107,19 +107,19 @@ public class DesktopCameraFrame extends JFrame
 
       //display the color correct original image
       Graphics cameraInputGraphics = cameraInputPanel.getGraphics();
-      cameraInputGraphics.drawImage(new Mat2Image(tracked.getColorCorrected()).getImage(), 0, 0, this);
+      cameraInputGraphics.drawImage(Tracked.getImage(tracked.getColorCorrected()), 0, 0, this);
 
       //display the hsv image
       Graphics hsvGraphics = hsvPanel.getGraphics();
-      hsvGraphics.drawImage(new Mat2Image(tracked.getHsv()).getImage(), 0, 0, this);
+      hsvGraphics.drawImage(Tracked.getImage(tracked.getHsv()), 0, 0, this);
 
       //display the black and white masked image
       Graphics maskedGraphics = maskedPanel.getGraphics();
-      maskedGraphics.drawImage(new Mat2Image(tracked.getMasked()).getImage(), 0, 0, this);
+      maskedGraphics.drawImage(Tracked.getImage(tracked.getMasked()), 0, 0, this);
 
       //display the resulting image with target circle(s)
       Graphics targetGraphics = targetPanel.getGraphics();
-      targetGraphics.drawImage(new Mat2Image(tracked.getTarget()).getImage(), 0, 0, this);
+      targetGraphics.drawImage(Tracked.getImage(tracked.getTarget()), 0, 0, this);
     }
   }
 
