@@ -1,4 +1,5 @@
 import org.opencv.core.Mat;
+import org.opencv.core.Size;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -12,8 +13,19 @@ public class Tracked
   private Mat colorCorrected = new Mat();
   private Mat hsv = new Mat();
   private Mat masked = new Mat();
-  private Mat target = new Mat();
+  private Target target;
   private Mat hierarchy = new Mat();
+  private Size frameSize;
+
+  public Tracked( Target target )
+  {
+    this.target = target;
+  }
+
+  public Size getFrameSize()
+  {
+    return frameSize;
+  }
 
   public Mat getHierarchy()
   {
@@ -40,7 +52,7 @@ public class Tracked
     return masked;
   }
 
-  public Mat getTarget()
+  public Target getTarget()
   {
     return target;
   }

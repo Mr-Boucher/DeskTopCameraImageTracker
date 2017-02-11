@@ -13,6 +13,7 @@ public class DesktopCameraFrame extends JFrame
 
   private CameraThread cameraThread = new CameraThread();
 
+  private Rectangle frameDimension = new Rectangle(100, 100, 650 * 2, 490 * 2);
   private final JPanel hsvPanel;
   private final JPanel maskedPanel;
   private final JPanel cameraInputPanel;
@@ -62,7 +63,7 @@ public class DesktopCameraFrame extends JFrame
     });
 
     //Create panel within the frame
-    setBounds(100, 100, 650 * 2, 490 * 2);
+    setBounds(frameDimension);
     mainPanel = new JPanel();
     mainPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
     setContentPane(mainPanel);
@@ -99,7 +100,7 @@ public class DesktopCameraFrame extends JFrame
   public void paint(Graphics g)
   {
     //display the processed captured image
-    Tracked tracked = new Tracked();
+    Tracked tracked = new Tracked( new Target( 200, 200, (int)frameDimension.getWidth()/2, (int)frameDimension.getHeight()/2 ) );
     if( cap.read(tracked.getCameraInput()) )
     {
       //process the captured image
@@ -119,7 +120,7 @@ public class DesktopCameraFrame extends JFrame
 
       //display the resulting image with target circle(s)
       Graphics targetGraphics = targetPanel.getGraphics();
-      targetGraphics.drawImage(Tracked.getImage(tracked.getTarget()), 0, 0, this);
+      targetGraphics.drawImage(Tracked.getImage(tracked.getTarget().getMat()), 0, 0, this);
     }
   }
 
