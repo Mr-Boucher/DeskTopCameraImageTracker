@@ -1,5 +1,7 @@
+package mrboucher.video.colortracker.tracking;
+
 import org.opencv.core.Mat;
-import org.opencv.core.Size;
+import org.opencv.imgproc.Imgproc;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -15,16 +17,9 @@ public class Tracked
   private Mat masked = new Mat();
   private Target target;
   private Mat hierarchy = new Mat();
-  private Size frameSize;
-
   public Tracked( Target target )
   {
     this.target = target;
-  }
-
-  public Size getFrameSize()
-  {
-    return frameSize;
   }
 
   public Mat getHierarchy()
@@ -78,4 +73,6 @@ public class Tracked
 
     return img;
   }
+
+
 }

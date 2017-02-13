@@ -1,3 +1,5 @@
+package mrboucher.video.colortracker.tracking;
+
 import org.opencv.core.*;
 import org.opencv.imgproc.Imgproc;
 
@@ -10,14 +12,6 @@ import java.util.ArrayList;
  */
 public class ImageTracker
 {
-  //These are the threshold values in order
-  public static final Scalar REFLECTIVE_TAPE_LOWER_COLOR_BOUNDS = new Scalar(58,0,109);
-  public static final Scalar REFLECTIVE_TAPE_UPPER_COLOR_BOUNDS = new Scalar(93,255,240);
-
-  //Testing for blue objects
-  public static final Scalar TEST_LOWER = new Scalar(150/2, 100, 20); //Blue objects
-  public static final Scalar TEST_UPPER = new Scalar(260/2, 255, 255); //Blue objects
-
   //Thickness of the boarder around objects
   public static final int OBJECT_BOARDER_SIZE = 2;
   public static final int TARGET_BOARDER_SIZE = 2;
@@ -28,9 +22,15 @@ public class ImageTracker
   //Default colors
   private static final Scalar OBJECT_BOARDER_COLOR = new Scalar(255, 0, 0);
   private static final Scalar TARGET_BOARDER_COLOR = new Scalar(0, 0, 255);
+  private final TrackerConfiguration trackerConfiguration;
+
+  public ImageTracker(TrackerConfiguration trackerConfiguration)
+  {
+    this.trackerConfiguration = trackerConfiguration;
+  }
 
   /**
-   * Updates the Tracked object with all the images to needed to find the object
+   * Updates the mrboucher.video.colortracker.tracking.Tracked object with all the images to needed to find the object
    *
    * @param tracked all images to find object
    */
@@ -46,7 +46,7 @@ public class ImageTracker
     tracked.getColorCorrected().copyTo( tracked.getTarget().getMat() );
 
     //mask out all colors not in range
-    Core.inRange(tracked.getHsv(), TEST_LOWER, TEST_UPPER, tracked.getMasked());
+    Core.inRange(tracked.getHsv(), trackerConfiguration.getLowerHSVScalar(), trackerConfiguration.getUpperHSVScalar(), tracked.getMasked());
 
     //Clean up noise
     Mat structuringElement = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(3,3));
@@ -57,9 +57,9 @@ public class ImageTracker
     Rect targetRectangle = tracked.getTarget().createRectangle( TARGET_BOARDER_SIZE );
     Imgproc.rectangle( tracked.getTarget().getMat(), targetRectangle.tl(), targetRectangle.br(), TARGET_BOARDER_COLOR, TARGET_BOARDER_SIZE);
 
-    //find the edges/contours of object that meet the inRange color specifications.
+    //find the edges/contours of object that meet the inRange color specifications. Use RETR_EXTERNAL so what only the outermost contours are found.
     ArrayList<MatOfPoint> contours = new ArrayList<MatOfPoint>();
-    Imgproc.findContours(tracked.getMasked().clone(), contours, tracked.getHierarchy(), Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_NONE);
+    Imgproc.findContours(tracked.getMasked().clone(), contours, tracked.getHierarchy(), trackerConfiguration.getTrackingMode().getMode().id, Imgproc.CHAIN_APPROX_NONE);
     for( MatOfPoint contour : contours )
     {
       //Get the edge rectangle for all contour objects

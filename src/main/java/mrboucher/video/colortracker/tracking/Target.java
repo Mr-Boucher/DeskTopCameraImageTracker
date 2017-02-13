@@ -1,3 +1,5 @@
+package mrboucher.video.colortracker.tracking;
+
 import org.opencv.core.Mat;
 import org.opencv.core.Rect;
 

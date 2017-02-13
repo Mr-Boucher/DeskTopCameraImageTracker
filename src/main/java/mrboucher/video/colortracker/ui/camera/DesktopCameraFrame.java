@@ -1,27 +1,40 @@
+package mrboucher.video.colortracker.ui.camera;
+
+import mrboucher.video.colortracker.tracking.ImageTracker;
+import mrboucher.video.colortracker.tracking.Target;
+import mrboucher.video.colortracker.tracking.Tracked;
+import mrboucher.video.colortracker.tracking.TrackerConfiguration;
+import mrboucher.video.colortracker.ui.configuration.ConfigurationFrame;
 import org.opencv.core.Core;
 import org.opencv.videoio.VideoCapture;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
-public class DesktopCameraFrame extends JFrame
+public class DesktopCameraFrame extends JFrame implements ChangeListener
 {
   static{ System.loadLibrary(Core.NATIVE_LIBRARY_NAME); }
 
   private CameraThread cameraThread = new CameraThread();
 
   private Rectangle frameDimension = new Rectangle(100, 100, 650 * 2, 490 * 2);
-  private final JPanel hsvPanel;
-  private final JPanel maskedPanel;
-  private final JPanel cameraInputPanel;
-  private final JPanel targetPanel;
-  private final JPanel mainPanel;
+  private JPanel hsvPanel = null;
+  private JPanel maskedPanel = null;
+  private JPanel cameraInputPanel = null;
+  private JPanel targetPanel = null;
+  private JPanel mainPanel = null;
 
+  private ConfigurationFrame configurationFrame;
   private final VideoCapture cap = new VideoCapture(0);
-  private ImageTracker tracker = new ImageTracker();
+
+  private TrackerConfiguration trackerConfiguration = new TrackerConfiguration();
+
+  private ImageTracker tracker = new ImageTracker(trackerConfiguration);
 
   /**
    * Launch the application.
@@ -62,8 +75,13 @@ public class DesktopCameraFrame extends JFrame
       }
     });
 
-    //Create panel within the frame
+    //frame setup
     setBounds(frameDimension);
+
+    // Set window content and validate.
+    setLayout(new BorderLayout());
+
+    //Create panel within the frame
     mainPanel = new JPanel();
     mainPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
     setContentPane(mainPanel);
@@ -88,8 +106,19 @@ public class DesktopCameraFrame extends JFrame
     targetPanel = new JPanel();
     bottomPanel.add( targetPanel );
 
+    //
+    configurationFrame = new ConfigurationFrame( trackerConfiguration, this );
+
     //start the background thread to run the receive the camera data
     cameraThread.start();
+  }
+
+  /**
+   *
+   * @param e
+   */
+  public void stateChanged(ChangeEvent e)
+  {
   }
 
   /**
