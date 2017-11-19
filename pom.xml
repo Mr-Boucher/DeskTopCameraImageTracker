@@ -8,5 +8,12 @@
     <artifactId>DeskTopCameraImageTracker</artifactId>
     <version>1.0-SNAPSHOT</version>
 
+    <dependencies>
+        <dependency>
+            <groupId>org.openpnp</groupId>
+            <artifactId>opencv</artifactId>
+            <version>3.2.0-1</version>
+        </dependency>
+    </dependencies>
 
 </project>

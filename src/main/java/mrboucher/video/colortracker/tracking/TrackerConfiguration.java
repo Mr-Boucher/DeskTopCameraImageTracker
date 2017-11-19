@@ -1,6 +1,5 @@
 package mrboucher.video.colortracker.tracking;
 
-import com.sun.management.jmx.TraceFilter;
 import org.opencv.core.Scalar;
 
 public class TrackerConfiguration
