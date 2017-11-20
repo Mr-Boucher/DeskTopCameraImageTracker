@@ -3,7 +3,7 @@ package mrboucher.video.colortracker.ui.camera;
 import mrboucher.video.colortracker.tracking.ImageTracker;
 import mrboucher.video.colortracker.tracking.Target;
 import mrboucher.video.colortracker.tracking.Tracked;
-import mrboucher.video.colortracker.tracking.TrackerConfiguration;
+import mrboucher.video.colortracker.tracking.TrackerContext;
 import mrboucher.video.colortracker.ui.configuration.ConfigurationFrame;
 import org.opencv.core.Core;
 import org.opencv.videoio.VideoCapture;
@@ -15,6 +15,7 @@ import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.image.BufferedImage;
 
 public class DesktopCameraFrame extends JFrame implements ChangeListener
 {
@@ -25,16 +26,16 @@ public class DesktopCameraFrame extends JFrame implements ChangeListener
   private Rectangle frameDimension = new Rectangle(100, 100, 650 * 2, 490 * 2);
   private JPanel hsvPanel = null;
   private JPanel maskedPanel = null;
-  private JPanel cameraInputPanel = null;
+  private JPanelWithImage cameraInputPanel = null;
   private JPanel targetPanel = null;
   private JPanel mainPanel = null;
 
   private ConfigurationFrame configurationFrame;
   private final VideoCapture cap = new VideoCapture(0);
 
-  private TrackerConfiguration trackerConfiguration = new TrackerConfiguration();
+  private TrackerContext trackerContext;
 
-  private ImageTracker tracker = new ImageTracker(trackerConfiguration);
+  private ImageTracker tracker;
 
   /**
    * Launch the application.
@@ -64,7 +65,7 @@ public class DesktopCameraFrame extends JFrame implements ChangeListener
   public DesktopCameraFrame()
   {
     //set up frame exit listeners
-    setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
     addWindowListener(new WindowAdapter()
     {
       @Override
@@ -92,7 +93,7 @@ public class DesktopCameraFrame extends JFrame implements ChangeListener
     JPanel topPanel = new JPanel();
     topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.X_AXIS));
     mainPanel.add( topPanel );
-    cameraInputPanel = new JPanel();
+    cameraInputPanel = new JPanelWithImage();
     topPanel.add( cameraInputPanel );
     hsvPanel = new JPanel();
     topPanel.add(hsvPanel);
@@ -107,7 +108,9 @@ public class DesktopCameraFrame extends JFrame implements ChangeListener
     bottomPanel.add( targetPanel );
 
     //
-    configurationFrame = new ConfigurationFrame( trackerConfiguration, this );
+    trackerContext = new TrackerContext( );
+    tracker = new ImageTracker(trackerContext);
+    configurationFrame = new ConfigurationFrame(trackerContext, this );
 
     //start the background thread to run the receive the camera data
     cameraThread.start();
@@ -137,7 +140,9 @@ public class DesktopCameraFrame extends JFrame implements ChangeListener
 
       //display the color correct original image
       Graphics cameraInputGraphics = cameraInputPanel.getGraphics();
-      cameraInputGraphics.drawImage(Tracked.getImage(tracked.getColorCorrected()), 0, 0, this);
+      BufferedImage image = Tracked.getImage(tracked.getColorCorrected());
+      trackerContext.setImage( image );
+      cameraInputGraphics.drawImage(image, 0, 0, this);
 
       //display the hsv image
       Graphics hsvGraphics = hsvPanel.getGraphics();
@@ -183,6 +188,7 @@ public class DesktopCameraFrame extends JFrame implements ChangeListener
         }
         catch (InterruptedException e)
         {
+          //ignore
         }
       }
     }

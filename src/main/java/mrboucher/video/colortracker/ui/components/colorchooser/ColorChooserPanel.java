@@ -1,4 +1,4 @@
-package mrboucher.video.colortracker.ui.components;
+package mrboucher.video.colortracker.ui.components.colorchooser;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -17,8 +17,7 @@ public class ColorChooserPanel extends JPanel implements ChangeListener
     super(new BorderLayout());
 
     //Set up the banner at the top of the window
-    banner = new JLabel("Welcome to the Tutorial Zone!",
-            JLabel.CENTER);
+    banner = new JLabel("Welcome to the Tutorial Zone!", JLabel.CENTER);
     banner.setForeground(Color.yellow);
     banner.setBackground(Color.blue);
     banner.setOpaque(true);
@@ -32,8 +31,7 @@ public class ColorChooserPanel extends JPanel implements ChangeListener
     //Set up color chooser for setting text color
     tcc = new JColorChooser(banner.getForeground());
     tcc.getSelectionModel().addChangeListener(this);
-    tcc.setBorder(BorderFactory.createTitledBorder(
-            "Choose Text Color"));
+    tcc.setBorder(BorderFactory.createTitledBorder("Choose Text Color"));
 
     add(bannerPanel, BorderLayout.CENTER);
     add(tcc, BorderLayout.PAGE_END);

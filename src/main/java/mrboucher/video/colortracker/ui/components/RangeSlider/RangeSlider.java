@@ -1,4 +1,4 @@
-package mrboucher.video.colortracker.ui.RangeSlider;
+package mrboucher.video.colortracker.ui.components.RangeSlider;
 
 import javax.swing.JSlider;
 
@@ -28,6 +28,10 @@ public class RangeSlider extends JSlider {
   public RangeSlider(int min, int max) {
     super(min, max);
     initSlider();
+  }
+
+  public RangeSlider(String name) {
+    this();
   }
 
   /**

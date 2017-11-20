@@ -1,24 +1,21 @@
 package mrboucher.video.colortracker.ui.configuration;
 
-import mrboucher.video.colortracker.tracking.TrackerConfiguration;
+import mrboucher.video.colortracker.tracking.TrackerContext;
 import mrboucher.video.colortracker.tracking.TrackingMode;
-import mrboucher.video.colortracker.ui.RangeSlider.RangeSlider;
-import mrboucher.video.colortracker.ui.RangeSlider.RangeSliderPanel;
+import mrboucher.video.colortracker.ui.components.RangeSlider.RangeSlider;
+import mrboucher.video.colortracker.ui.components.RangeSlider.RangeSliderPanel;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+import java.awt.event.*;
 
 public class ConfigurationFrame extends JFrame implements ChangeListener, ActionListener
 {
-  private final JComboBox rectangleModeChooser;
-  private Rectangle frameDimension = new Rectangle(100, 100, 300, 300);
-  private final TrackerConfiguration trackerConfiguration;
+  private final JComboBox<TrackingMode.ModeType> rectangleModeChooser;
+  private Rectangle frameDimension = new Rectangle(100, 100, 300, 400);
+  private final TrackerContext trackerContext;
 
   private RangeSliderPanel objectHueSlider;
   private RangeSliderPanel objectSaturationSlider;
@@ -35,7 +32,7 @@ public class ConfigurationFrame extends JFrame implements ChangeListener, Action
       {
         try
         {
-          ConfigurationFrame frame = new ConfigurationFrame( new TrackerConfiguration() );
+          ConfigurationFrame frame = new ConfigurationFrame( new TrackerContext( ) );
           frame.setVisible(true);
         }
         catch (Exception e)
@@ -46,17 +43,21 @@ public class ConfigurationFrame extends JFrame implements ChangeListener, Action
     });
   }
 
-  public ConfigurationFrame( TrackerConfiguration trackerConfiguration )
+  public ConfigurationFrame( TrackerContext trackerContext)
   {
-    this( trackerConfiguration, null );
+    this(trackerContext, null );
+  }
+
+  public Rectangle getFrameDimension() {
+    return frameDimension;
   }
 
   /**
    * Create the frame.
    */
-  public ConfigurationFrame( TrackerConfiguration trackerConfiguration, Component component )
+  public ConfigurationFrame(final TrackerContext trackerContext, Component component )
   {
-    this.trackerConfiguration = trackerConfiguration;
+    this.trackerContext = trackerContext;
     //set up frame exit listeners
     addWindowListener(new WindowAdapter()
     {
@@ -76,18 +77,18 @@ public class ConfigurationFrame extends JFrame implements ChangeListener, Action
     setLocationRelativeTo(component);
     setVisible(true);
 
-    rectangleModeChooser = new JComboBox(TrackingMode.ModeType.values());
+    rectangleModeChooser = new JComboBox<>(TrackingMode.ModeType.values());
     rectangleModeChooser.setSelectedIndex(0);
     rectangleModeChooser.addActionListener(this);
 
     //Create control Panel
-    objectHueSlider = new RangeSliderPanel( trackerConfiguration.getHueRange(), this );
+    objectHueSlider = new RangeSliderPanel( "Hue", trackerContext.getHueRange(), this );
     objectHueSlider.initialize();
 
-    objectSaturationSlider = new RangeSliderPanel( trackerConfiguration.getSaturationRange(), this );
+    objectSaturationSlider = new RangeSliderPanel( "Saturation", trackerContext.getSaturationRange(), this );
     objectSaturationSlider.initialize();
 
-    objectValueSlider = new RangeSliderPanel( trackerConfiguration.getValueRange(), this );
+    objectValueSlider = new RangeSliderPanel( "Value", trackerContext.getValueRange(), this );
     objectValueSlider.initialize();
 
     JPanel mainPanel = new JPanel();
@@ -98,9 +99,52 @@ public class ConfigurationFrame extends JFrame implements ChangeListener, Action
     mainPanel.add( objectValueSlider );
 
     // Create window frame.
-    setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
     setResizable(false);
     setTitle("Configuration Frame");
+
+    //
+    component.addMouseListener(new MouseAdapter() {
+      @Override
+      public void mousePressed(MouseEvent e) {
+        updateColorSelector( e );
+      }
+    });
+  }
+
+  /**
+   *
+   * @param e
+   */
+  private void updateColorSelector( MouseEvent e ) {
+    int x = e.getX();
+    int y = e.getY();
+    int packedInt = trackerContext.getImage().getRGB(e.getX(), e.getY());
+    Color color = new Color(packedInt, true);
+    int r = color.getRed();
+    int g = color.getGreen();
+    int b = color.getBlue();
+    float[] hsv = new float[3];
+    Color.RGBtoHSB(r,g,b,hsv);
+    float hue = hsv[0];
+    float sat = hsv[1];
+    float value = hsv[2];
+
+    int separationValue = 20;
+
+    objectHueSlider.getRangeSlider().setValue( (int)hue - separationValue );
+    objectHueSlider.getRangeSlider().setUpperValue( (int)hue + separationValue );
+
+    objectSaturationSlider.getRangeSlider().setValue( (int)hue - separationValue );
+    objectSaturationSlider.getRangeSlider().setUpperValue( (int)hue + separationValue );
+
+    objectValueSlider.getRangeSlider().setValue( (int)hue - separationValue );
+    objectValueSlider.getRangeSlider().setUpperValue( (int)hue + separationValue );
+
+
+    String message = x + "/" + y + "\n" + hue + "/" + sat + "/" + value;
+    System.out.println( message );
+    JOptionPane.showMessageDialog(null, message, "X/Y", JOptionPane.INFORMATION_MESSAGE);
   }
 
   @Override
@@ -109,26 +153,26 @@ public class ConfigurationFrame extends JFrame implements ChangeListener, Action
     if (e.getSource() == objectHueSlider.getRangeSlider())
     {
       RangeSlider slider = (RangeSlider)e.getSource();
-      trackerConfiguration.getHueRange().setLowerRange( slider.getValue() );
-      trackerConfiguration.getHueRange().setUpperRange( slider.getUpperValue() );
+      trackerContext.getHueRange().setLowerRange( slider.getValue() );
+      trackerContext.getHueRange().setUpperRange( slider.getUpperValue() );
     }
     else if (e.getSource() == objectSaturationSlider.getRangeSlider())
     {
       RangeSlider slider = (RangeSlider)e.getSource();
-      trackerConfiguration.getSaturationRange().setLowerRange( slider.getValue() );
-      trackerConfiguration.getSaturationRange().setUpperRange( slider.getUpperValue() );
+      trackerContext.getSaturationRange().setLowerRange( slider.getValue() );
+      trackerContext.getSaturationRange().setUpperRange( slider.getUpperValue() );
     }
     else if (e.getSource() == objectValueSlider.getRangeSlider())
     {
       RangeSlider slider = (RangeSlider)e.getSource();
-      trackerConfiguration.getValueRange().setLowerRange( slider.getValue() );
-      trackerConfiguration.getValueRange().setUpperRange( slider.getUpperValue() );
+      trackerContext.getValueRange().setLowerRange( slider.getValue() );
+      trackerContext.getValueRange().setUpperRange( slider.getUpperValue() );
     }
   }
 
   @Override
   public void actionPerformed(ActionEvent e)
   {
-    trackerConfiguration.getTrackingMode().setMode( (TrackingMode.ModeType)rectangleModeChooser.getSelectedItem() );
+    trackerContext.getTrackingMode().setMode( (TrackingMode.ModeType)rectangleModeChooser.getSelectedItem() );
   }
 }

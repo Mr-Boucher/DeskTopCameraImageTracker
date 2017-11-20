@@ -1,4 +1,4 @@
-package mrboucher.video.colortracker.ui.RangeSlider;
+package mrboucher.video.colortracker.ui.components.RangeSlider;
 
 import mrboucher.video.colortracker.tracking.RangeFinder;
 
@@ -20,30 +20,32 @@ public class RangeSliderPanel extends JPanel {
 
   private final RangeFinder rangeFinder;
   private final ChangeListener changeListener;
-  private JLabel rangeSliderLabel1 = new JLabel();
-  private JLabel rangeSliderValue1 = new JLabel();
-  private JLabel rangeSliderLabel2 = new JLabel();
-  private JLabel rangeSliderValue2 = new JLabel();
+  private JLabel titleJLabel = new JLabel();
+  private JLabel lowerBoundLabel = new JLabel();
+  private JLabel lowerBoundValue = new JLabel();
+  private JLabel upperBoundLabel = new JLabel();
+  private JLabel upperBoundValue = new JLabel();
   private RangeSlider rangeSlider;
 
-  public RangeSliderPanel( RangeFinder rangeFinder, ChangeListener changeListener  ) {
+  public RangeSliderPanel( String title, RangeFinder rangeFinder, ChangeListener changeListener  ) {
     this.rangeFinder = rangeFinder;
     this.changeListener = changeListener;
-    createRangeSlider(rangeFinder, changeListener);
+    createRangeSlider(title, rangeFinder, changeListener);
   }
 
-  private RangeSlider createRangeSlider(RangeFinder rangeFinder, ChangeListener changeListener)
+  private RangeSlider createRangeSlider( String title, RangeFinder rangeFinder, ChangeListener changeListener)
   {
     //
     setBorder(BorderFactory.createEmptyBorder(6, 6, 6, 6));
     setLayout(new GridBagLayout());
 
     //
-    rangeSlider = new RangeSlider();
-    rangeSliderLabel1.setText("Lower value:");
-    rangeSliderLabel2.setText("Upper value:");
-    rangeSliderValue1.setHorizontalAlignment(JLabel.LEFT);
-    rangeSliderValue2.setHorizontalAlignment(JLabel.LEFT);
+    rangeSlider = new RangeSlider( title );
+    this.titleJLabel.setText( title + ":" );
+    lowerBoundLabel.setText("Lower value:");
+    upperBoundLabel.setText("Upper value:");
+    lowerBoundValue.setHorizontalAlignment(JLabel.LEFT);
+    upperBoundValue.setHorizontalAlignment(JLabel.LEFT);
 
     rangeSlider.setPreferredSize(new Dimension(240, rangeSlider.getPreferredSize().height));
     rangeSlider.setMinimum(rangeFinder.getMinRange());
@@ -57,21 +59,28 @@ public class RangeSliderPanel extends JPanel {
     rangeSlider.addChangeListener(new ChangeListener() {
       public void stateChanged(ChangeEvent e) {
         RangeSlider slider = (RangeSlider) e.getSource();
-        rangeSliderValue1.setText(String.valueOf(slider.getValue()));
-        rangeSliderValue2.setText(String.valueOf(slider.getUpperValue()));
+        lowerBoundValue.setText(String.valueOf(slider.getValue()));
+        upperBoundValue.setText(String.valueOf(slider.getUpperValue()));
       }
     });
 
     //add layout
-    add(rangeSliderLabel1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+    add(titleJLabel, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
             GridBagConstraints.NORTHWEST, GridBagConstraints.NONE, new Insets(0, 0, 3, 3), 0, 0));
-    add(rangeSliderValue1, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
+
+    //
+    add(lowerBoundLabel, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
+            GridBagConstraints.NORTHWEST, GridBagConstraints.NONE, new Insets(0, 0, 3, 3), 0, 0));
+    add(lowerBoundValue, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0,
             GridBagConstraints.NORTHWEST, GridBagConstraints.NONE, new Insets(0, 0, 3, 0), 0, 0));
-    add(rangeSliderLabel2, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
+
+    //
+    add(upperBoundLabel, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0,
             GridBagConstraints.NORTHWEST, GridBagConstraints.NONE, new Insets(0, 0, 3, 3), 0, 0));
-    add(rangeSliderValue2, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0,
+    add(upperBoundValue, new GridBagConstraints(1, 2, 1, 1, 0.0, 0.0,
             GridBagConstraints.NORTHWEST, GridBagConstraints.NONE, new Insets(0, 0, 6, 0), 0, 0));
-    add(rangeSlider      , new GridBagConstraints(0, 2, 2, 1, 0.0, 0.0,
+
+    add(rangeSlider, new GridBagConstraints(0, 3, 2, 1, 0.0, 0.0,
             GridBagConstraints.NORTHWEST, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0));
 
     return rangeSlider;
@@ -83,8 +92,8 @@ public class RangeSliderPanel extends JPanel {
     rangeSlider.setUpperValue((int)rangeFinder.getUpperRange());
 
     // Initialize value display.
-    rangeSliderValue1.setText(String.valueOf(rangeSlider.getValue()));
-    rangeSliderValue2.setText(String.valueOf(rangeSlider.getUpperValue()));
+    lowerBoundValue.setText(String.valueOf(rangeSlider.getValue()));
+    upperBoundValue.setText(String.valueOf(rangeSlider.getUpperValue()));
 
 
   }

@@ -22,11 +22,11 @@ public class ImageTracker
   //Default colors
   private static final Scalar OBJECT_BOARDER_COLOR = new Scalar(255, 0, 0);
   private static final Scalar TARGET_BOARDER_COLOR = new Scalar(0, 0, 255);
-  private final TrackerConfiguration trackerConfiguration;
+  private final TrackerContext trackerContext;
 
-  public ImageTracker(TrackerConfiguration trackerConfiguration)
+  public ImageTracker(TrackerContext trackerContext)
   {
-    this.trackerConfiguration = trackerConfiguration;
+    this.trackerContext = trackerContext;
   }
 
   /**
@@ -46,7 +46,7 @@ public class ImageTracker
     tracked.getColorCorrected().copyTo( tracked.getTarget().getMat() );
 
     //mask out all colors not in range
-    Core.inRange(tracked.getHsv(), trackerConfiguration.getLowerHSVScalar(), trackerConfiguration.getUpperHSVScalar(), tracked.getMasked());
+    Core.inRange(tracked.getHsv(), trackerContext.getLowerHSVScalar(), trackerContext.getUpperHSVScalar(), tracked.getMasked());
 
     //Clean up noise
     Mat structuringElement = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(3,3));
@@ -59,7 +59,7 @@ public class ImageTracker
 
     //find the edges/contours of object that meet the inRange color specifications. Use RETR_EXTERNAL so what only the outermost contours are found.
     ArrayList<MatOfPoint> contours = new ArrayList<MatOfPoint>();
-    Imgproc.findContours(tracked.getMasked().clone(), contours, tracked.getHierarchy(), trackerConfiguration.getTrackingMode().getMode().id, Imgproc.CHAIN_APPROX_NONE);
+    Imgproc.findContours(tracked.getMasked().clone(), contours, tracked.getHierarchy(), trackerContext.getTrackingMode().getMode().id, Imgproc.CHAIN_APPROX_NONE);
     for( MatOfPoint contour : contours )
     {
       //Get the edge rectangle for all contour objects

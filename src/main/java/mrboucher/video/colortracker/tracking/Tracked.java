@@ -59,7 +59,7 @@ public class Tracked
    *
    * @return the Image
    */
-  public static Image getImage( Mat mat ){
+  public static BufferedImage getImage( Mat mat ){
     BufferedImage img = null;
     int w = mat.cols();
     int h = mat.rows();

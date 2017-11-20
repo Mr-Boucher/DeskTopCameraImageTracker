@@ -1,4 +1,4 @@
-package mrboucher.video.colortracker.ui.RangeSlider;
+package mrboucher.video.colortracker.ui.components.RangeSlider;
 
 import java.awt.Color;
 import java.awt.Dimension;
