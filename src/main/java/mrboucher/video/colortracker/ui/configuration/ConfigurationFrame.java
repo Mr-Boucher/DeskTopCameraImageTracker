@@ -117,8 +117,6 @@ public class ConfigurationFrame extends JFrame implements ChangeListener, Action
    * @param e
    */
   private void updateColorSelector( MouseEvent e ) {
-    int x = e.getX();
-    int y = e.getY();
     int packedInt = trackerContext.getImage().getRGB(e.getX(), e.getY());
     Color color = new Color(packedInt, true);
     int r = color.getRed();
@@ -126,25 +124,20 @@ public class ConfigurationFrame extends JFrame implements ChangeListener, Action
     int b = color.getBlue();
     float[] hsv = new float[3];
     Color.RGBtoHSB(r,g,b,hsv);
-    float hue = hsv[0];
-    float sat = hsv[1];
-    float value = hsv[2];
 
     int separationValue = 20;
 
+    float hue = hsv[0] * 180;
     objectHueSlider.getRangeSlider().setValue( (int)hue - separationValue );
     objectHueSlider.getRangeSlider().setUpperValue( (int)hue + separationValue );
 
-    objectSaturationSlider.getRangeSlider().setValue( (int)hue - separationValue );
-    objectSaturationSlider.getRangeSlider().setUpperValue( (int)hue + separationValue );
+    float sat = hsv[1] * 255;
+    objectSaturationSlider.getRangeSlider().setValue( (int)sat - separationValue );
+    objectSaturationSlider.getRangeSlider().setUpperValue( (int)sat + separationValue );
 
-    objectValueSlider.getRangeSlider().setValue( (int)hue - separationValue );
-    objectValueSlider.getRangeSlider().setUpperValue( (int)hue + separationValue );
-
-
-    String message = x + "/" + y + "\n" + hue + "/" + sat + "/" + value;
-    System.out.println( message );
-    JOptionPane.showMessageDialog(null, message, "X/Y", JOptionPane.INFORMATION_MESSAGE);
+    float value = hsv[2] * 255;
+    objectValueSlider.getRangeSlider().setValue( (int)value - separationValue );
+    objectValueSlider.getRangeSlider().setUpperValue( (int)value + separationValue );
   }
 
   @Override
