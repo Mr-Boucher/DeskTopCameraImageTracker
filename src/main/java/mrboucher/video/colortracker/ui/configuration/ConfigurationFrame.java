@@ -132,12 +132,12 @@ public class ConfigurationFrame extends JFrame implements ChangeListener, Action
     objectHueSlider.getRangeSlider().setUpperValue( (int)hue + separationValue );
 
     float sat = hsv[1] * 255;
-    objectSaturationSlider.getRangeSlider().setValue( (int)sat - separationValue );
-    objectSaturationSlider.getRangeSlider().setUpperValue( (int)sat + separationValue );
+    objectSaturationSlider.getRangeSlider().setValue( (int)sat - 100 );
+    objectSaturationSlider.getRangeSlider().setUpperValue( (int)sat + 100 );
 
     float value = hsv[2] * 255;
-    objectValueSlider.getRangeSlider().setValue( (int)value - separationValue );
-    objectValueSlider.getRangeSlider().setUpperValue( (int)value + separationValue );
+    objectValueSlider.getRangeSlider().setValue( (int)value - 100 );
+    objectValueSlider.getRangeSlider().setUpperValue( (int)value + 100 );
   }
 
   @Override
